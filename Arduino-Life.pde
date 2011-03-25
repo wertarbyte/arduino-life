@@ -21,6 +21,13 @@ enum {
 	B_WRAPPED,
 } border_type = B_DEAD;
 
+enum {
+	// load a predefined configuration on start
+	S_PRESET,
+	// populate the field randomly
+	S_RANDOM
+} seed_style = S_PRESET;
+
 // pins controlling the rows
 const int rows[D_ROWS] = {
 	12,
@@ -48,12 +55,28 @@ void clear_field() {
 	}
 }
 
+// a nice starting configuration
+const bool seed_preset[D_ROWS][D_COLS] = {
+	{ 0, 0, 0, 0, 0, 0, 0 },
+	{ 0, 0, 0, 1, 0, 0, 0 },
+	{ 0, 1, 1, 1, 0, 0, 0 },
+	{ 0, 0, 0, 1, 0, 0, 0 },
+	{ 0, 0, 0, 0, 0, 0, 0 },
+};
+
+int reseeds = 0;
+
 void seed_field() {
 	for (int x=0; x < D_ROWS; x++) {
 		for (int y=0; y < D_COLS; y++) {
-			field[current][x][y] = (random(3)==0) ? true : false;
+			if (seed_style == S_PRESET) {
+				field[current][x][y] = seed_preset[x][(y+reseeds)%D_COLS];
+			} else if (seed_style == S_RANDOM) {
+				field[current][x][y] = (random(6)==0) ? true : false;
+			}
 		}
 	}
+	reseeds++;
 }
 
 int cells_alive() {

@@ -28,7 +28,7 @@ int active_row = 0;
 // when did we last update the ecosphere
 unsigned long lastrun;
 // update the positions every _ milliseconds
-int tick = 200;
+int tick = 300;
 
 int current = 0;
 boolean field[2][D_ROWS][D_COLS];
@@ -44,7 +44,7 @@ void clear_field() {
 void seed_field() {
 	for (int x=0; x < D_ROWS; x++) {
 		for (int y=0; y < D_COLS; y++) {
-			field[current][x][y] = (random(5)==0) ? true : false;
+			field[current][x][y] = (random(3)==0) ? true : false;
 		}
 	}
 }

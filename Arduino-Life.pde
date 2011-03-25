@@ -14,6 +14,13 @@
 #define D_ROWS 5
 #define D_COLS 7
 
+// How do we handle the border of the field?
+enum {
+	B_DEAD,
+	B_ALIVE,
+	B_WRAPPED,
+} border_type = B_DEAD;
+
 // pins controlling the rows
 const int rows[D_ROWS] = {
 	12,
@@ -65,10 +72,18 @@ short neighbours(int x, int y, boolean f[D_ROWS][D_COLS]) {
 	int n = 0;
 	for (int dx=-1; dx<=+1; dx++) {
 		for (int dy=-1; dy<=+1; dy++) {
-			if (dx == 0 && dy == 0);
-			else if (x+dx >= D_ROWS || x+dx < 0);
-			else if (y+dy >= D_COLS || y+dy < 0);
-			else if (f[x+dx][y+dy]) n++;
+			if (dx == 0 && dy == 0) continue;
+			if (border_type == B_DEAD) {
+				if (x+dx >= D_ROWS || x+dx < 0);
+				else if (y+dy >= D_COLS || y+dy < 0);
+				else if (f[x+dx][y+dy]) n++;
+			} else if (border_type == B_ALIVE) {
+				if (x+dx >= D_ROWS || x+dx < 0) n++;
+				else if (y+dy >= D_COLS || y+dy < 0) n++;
+				else if (f[x+dx][y+dy]) n++;
+			} else if (border_type == B_WRAPPED) {
+				if (f[(x+dx)%D_ROWS][(y+dy)%D_COLS]) n++;
+			}
 		}
 	}
 	return n;

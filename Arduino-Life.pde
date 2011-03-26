@@ -70,7 +70,8 @@ void seed_field() {
 	for (int x=0; x < D_ROWS; x++) {
 		for (int y=0; y < D_COLS; y++) {
 			if (seed_style == S_PRESET) {
-				field[current][x][y] = seed_preset[x][(y+reseeds)%D_COLS];
+				// mirror the y axis to reflect the presentation in the source
+				field[current][x][D_COLS-1-y] = seed_preset[active_preset][x][(y+reseeds)%D_COLS];
 			} else if (seed_style == S_RANDOM) {
 				field[current][x][y] = (random(6)==0) ? true : false;
 			}

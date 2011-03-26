@@ -12,3 +12,6 @@ F_CPU		= 16000000
 ARDUINO_PORT	= /dev/arduino
 
 include Arduino.mk
+
+config.h:
+	touch $@

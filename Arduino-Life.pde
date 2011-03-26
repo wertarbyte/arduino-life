@@ -19,14 +19,14 @@ enum {
 	B_DEAD,
 	B_ALIVE,
 	B_WRAPPED,
-} border_type = B_WRAPPED;
+} border_type = B_DEAD;
 
 enum {
 	// load a predefined configuration on start
 	S_PRESET,
 	// populate the field randomly
 	S_RANDOM
-} seed_style = S_PRESET;
+} seed_style = S_RANDOM;
 
 // pins controlling the rows
 const int rows[D_ROWS] = {
@@ -55,7 +55,7 @@ void clear_field() {
 	}
 }
 
-int active_preset = 1;
+int active_preset = 0;
 #define N_PRESETS 2
 // a nice starting configuration
 const bool seed_preset[N_PRESETS][D_ROWS][D_COLS] = {
@@ -159,6 +159,13 @@ void load_line(byte line) {
 	digitalWrite(LATCH, HIGH);
 }
 
+void configure() {
+	seed_style = S_RANDOM;
+	border_type = B_DEAD;
+	active_preset = 0;
+#include <config.h>
+}
+
 void setup() { 
 	for (int i=0; i<D_ROWS; i++) {
 		pinMode(rows[i], OUTPUT);  
@@ -171,6 +178,8 @@ void setup() {
 	pinMode(LATCH, OUTPUT);
 
 	randomSeed(analogRead(A0));
+
+	configure();
 
 	clear_field();
 	seed_field();

@@ -19,7 +19,7 @@ enum {
 	B_DEAD,
 	B_ALIVE,
 	B_WRAPPED,
-} border_type = B_DEAD;
+} border_type = B_WRAPPED;
 
 enum {
 	// load a predefined configuration on start
@@ -55,13 +55,24 @@ void clear_field() {
 	}
 }
 
+int active_preset = 1;
+#define N_PRESETS 2
 // a nice starting configuration
-const bool seed_preset[D_ROWS][D_COLS] = {
-	{ 0, 0, 0, 0, 0, 0, 0 },
-	{ 0, 0, 0, 1, 0, 0, 0 },
-	{ 0, 1, 1, 1, 0, 0, 0 },
-	{ 0, 0, 0, 1, 0, 0, 0 },
-	{ 0, 0, 0, 0, 0, 0, 0 },
+const bool seed_preset[N_PRESETS][D_ROWS][D_COLS] = {
+	{ // nice flower
+		{ 0, 0, 0, 0, 0, 0, 0 },
+		{ 0, 0, 0, 1, 0, 0, 0 },
+		{ 0, 1, 1, 1, 0, 0, 0 },
+		{ 0, 0, 0, 1, 0, 0, 0 },
+		{ 0, 0, 0, 0, 0, 0, 0 },
+	},
+	{ // glider
+		{ 0, 0, 0, 0, 0, 0, 0 },
+		{ 0, 0, 1, 0, 0, 0, 0 },
+		{ 0, 0, 0, 1, 0, 0, 0 },
+		{ 0, 1, 1, 1, 0, 0, 0 },
+		{ 0, 0, 0, 0, 0, 0, 0 },
+	},
 };
 
 int reseeds = 0;

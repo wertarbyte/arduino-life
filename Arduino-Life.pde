@@ -105,7 +105,8 @@ short neighbours(int x, int y, boolean f[D_ROWS][D_COLS]) {
 				else if (y+dy >= D_COLS || y+dy < 0) n++;
 				else if (f[x+dx][y+dy]) n++;
 			} else if (border_type == B_WRAPPED) {
-				if (f[(x+dx)%D_ROWS][(y+dy)%D_COLS]) n++;
+				// make sure x+dx and y+dy are > 0
+				if (f[(D_ROWS+x+dx)%D_ROWS][(D_COLS+y+dy)%D_COLS]) n++;
 			}
 		}
 	}

@@ -30,12 +30,16 @@
     74HC959 13 (OE)  -> GND
     74HC959 16 (VCC) -> GND
 
+    A button is connected to port 7.
+
 */
 
 // shift register pins
 #define DATA 6
 #define CLOCK 5
 #define LATCH 4
+
+#define BTN 7
 
 #define D_ROWS 5
 #define D_COLS 7
@@ -69,6 +73,8 @@ int active_row = 0;
 unsigned long lastrun;
 // update the positions every _ milliseconds
 int tick = 300;
+
+int btn_state = 0;
 
 int current = 0;
 boolean field[2][D_ROWS][D_COLS];
@@ -204,7 +210,15 @@ void setup() {
 }
 
 void loop() {
-	int val = analogRead(A0);
+	int new_state = digitalRead(BTN);
+	if (new_state == 1 && btn_state == 0) {
+		// advance to next preset
+		clear_field();
+		active_preset = (active_preset+1)%N_PRESETS;
+		seed_field();
+		delay(100);
+	}
+	btn_state = new_state;
 
 	int line = 0;
 	for (int y=0; y<D_COLS; y++) {

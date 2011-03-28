@@ -41,18 +41,18 @@
 #define D_COLS 7
 
 // How do we handle the border of the field?
-enum {
+enum border_type {
 	B_DEAD,
 	B_ALIVE,
 	B_WRAPPED,
-} border_type = B_DEAD;
+};
 
-enum {
+enum seed_style {
 	// load a predefined configuration on start
 	S_PRESET,
 	// populate the field randomly
 	S_RANDOM
-} seed_style = S_RANDOM;
+};
 
 // pins controlling the rows
 const int rows[D_ROWS] = {
@@ -81,35 +81,28 @@ void clear_field() {
 	}
 }
 
-int active_preset = 0;
-#define N_PRESETS 2
-// a nice starting configuration
-const bool seed_preset[N_PRESETS][D_ROWS][D_COLS] = {
-	{ // nice flower
-		{ 0, 0, 0, 0, 0, 0, 0 },
-		{ 0, 0, 0, 1, 0, 0, 0 },
-		{ 0, 1, 1, 1, 0, 0, 0 },
-		{ 0, 0, 0, 1, 0, 0, 0 },
-		{ 0, 0, 0, 0, 0, 0, 0 },
-	},
-	{ // glider
-		{ 0, 0, 0, 0, 0, 0, 0 },
-		{ 0, 0, 1, 0, 0, 0, 0 },
-		{ 0, 0, 0, 1, 0, 0, 0 },
-		{ 0, 1, 1, 1, 0, 0, 0 },
-		{ 0, 0, 0, 0, 0, 0, 0 },
-	},
-};
+typedef struct {
+	border_type border;
+	seed_style seed;
+	bool field[D_ROWS][D_COLS];
+} preset;
+
+#include <presets.h>
+
+static inline const preset *get_preset() {
+	return &presets[active_preset];
+}
 
 int reseeds = 0;
 
 void seed_field() {
+	const preset *ps = get_preset();
 	for (int x=0; x < D_ROWS; x++) {
 		for (int y=0; y < D_COLS; y++) {
-			if (seed_style == S_PRESET) {
+			if (ps->seed == S_PRESET) {
 				// mirror the y axis to reflect the presentation in the source
-				field[current][x][D_COLS-1-y] = seed_preset[active_preset][x][(y+reseeds)%D_COLS];
-			} else if (seed_style == S_RANDOM) {
+				field[current][x][D_COLS-1-y] = ps->field[x][(y+reseeds)%D_COLS];
+			} else if (ps->seed == S_RANDOM) {
 				field[current][x][y] = (random(6)==0) ? true : false;
 			}
 		}
@@ -130,19 +123,20 @@ int cells_alive() {
 }
 
 short neighbours(int x, int y, boolean f[D_ROWS][D_COLS]) {
+	const preset *ps = get_preset();
 	int n = 0;
 	for (int dx=-1; dx<=+1; dx++) {
 		for (int dy=-1; dy<=+1; dy++) {
 			if (dx == 0 && dy == 0) continue;
-			if (border_type == B_DEAD) {
+			if (ps->border == B_DEAD) {
 				if (x+dx >= D_ROWS || x+dx < 0);
 				else if (y+dy >= D_COLS || y+dy < 0);
 				else if (f[x+dx][y+dy]) n++;
-			} else if (border_type == B_ALIVE) {
+			} else if (ps->border == B_ALIVE) {
 				if (x+dx >= D_ROWS || x+dx < 0) n++;
 				else if (y+dy >= D_COLS || y+dy < 0) n++;
 				else if (f[x+dx][y+dy]) n++;
-			} else if (border_type == B_WRAPPED) {
+			} else if (ps->border == B_WRAPPED) {
 				// make sure x+dx and y+dy are > 0
 				if (f[(D_ROWS+x+dx)%D_ROWS][(D_COLS+y+dy)%D_COLS]) n++;
 			}
@@ -186,9 +180,7 @@ void load_line(byte line) {
 }
 
 void configure() {
-	seed_style = S_RANDOM;
-	border_type = B_DEAD;
-	active_preset = 0;
+	active_preset = 2;
 #include <config.h>
 }
 
